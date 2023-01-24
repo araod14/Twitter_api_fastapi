@@ -2,8 +2,8 @@ from fastapi import APIRouter
 from fastapi import status
 from fastapi import Body
 from typing import List
-import json 
 from schemas.user import User, UserRegister
+import json 
 
 
 
