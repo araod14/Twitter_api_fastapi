@@ -11,7 +11,7 @@ from datetime import date
 
 class UserBase(BaseModel):
     user_id: UUID = Field(...)
-    email_user: str =Field(...)
+    email_user: EmailStr =Field(...)
 
 class UserLogin(UserBase):
     password: str = Field(
