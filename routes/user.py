@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi import status
-from fastapi import Body
+from fastapi import Body, Path
 from typing import List
 from schemas.user import User, UserRegister
 from models.user import users
@@ -69,7 +69,7 @@ def login():
 ###Show all users
 @user.get(
     path= '/users',
-    response_model= User,
+    #response_model= User,
     status_code=status.HTTP_200_OK,
     summary= 'Show all users',
     tags= ['Users']
@@ -85,20 +85,39 @@ def show_all_users():
         - first_name: str
         - Last_name: str
         - birth_date: datetime
-    """
+    
     with open("users.json", "r", encoding="utf-8") as f:
         results = json.loads(f.read())
         return results
+    """
+    return conn.execute(users.select()).fetchall()
+        
 ###Show a users
 @user.get(
     path= '/users/{user_id}',
-    response_model= List[User],
+    #response_model= List[User],
     status_code=status.HTTP_200_OK,
     summary= 'Show a user',
     tags= ['Users']
 )
-def show_a_user():
-    pass
+def show_a_user(user_id: str = Path(
+        ...,
+        title = "User's ID",
+        description = "This is the person id. It's required"
+        )):
+    """
+    This path operation show a user in the app
+    Parameters:
+    -
+    return a json list with all users in the app, with the following keys
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - Last_name: str
+        - birth_date: datetime
+    """
+    return conn.execute(users.select().where(users.c.id == user_id)).first()
+
 ###Delete a users
 @user.delete(
     path= '/users/{user_id}/delete',
