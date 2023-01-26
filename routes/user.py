@@ -3,10 +3,15 @@ from fastapi import status
 from fastapi import Body
 from typing import List
 from schemas.user import User, UserRegister
+from models.user import users
+from config.db import conn
+from cryptography.fernet import Fernet
+from uuid import uuid4
 import json 
 
 
-
+key = Fernet.generate_key()
+f =Fernet(key)
 user = APIRouter()
 
 #Path Operations
@@ -33,7 +38,7 @@ def signup(user: UserRegister = Body(...)):
         - first_name: str
         - Last_name: str
         - birth_date: datetime
-    """
+
     with open("users.json", "r+", encoding="utf-8") as f:
         results = json.loads(f.read()) 
         user_dict = user.dict()
@@ -43,6 +48,14 @@ def signup(user: UserRegister = Body(...)):
         f.seek(0)
         f.write(json.dumps(results))
         return user
+    """
+    new_user = {'first_name':user.first_name,'last_name':user.last_name,'birth_date':user.birth_date, 'email':user.email_user}
+    new_user['password'] = f.encrypt(user.password.encode('utf-8'))
+    new_user['id'] = uuid4()
+    conn.execute(users.insert().values(new_user))
+    #return conn.execute(users.select().where(users.c.id==result.inserted_primary_key['id'])).first()
+    #return result.inserted_primary_key['id']
+
 ###Login a user
 @user.post(
     path= '/login',
