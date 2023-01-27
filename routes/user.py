@@ -85,10 +85,6 @@ def show_all_users():
         - first_name: str
         - Last_name: str
         - birth_date: datetime
-    
-    with open("users.json", "r", encoding="utf-8") as f:
-        results = json.loads(f.read())
-        return results
     """
     return conn.execute(users.select()).fetchall()
         
@@ -121,20 +117,47 @@ def show_a_user(user_id: str = Path(
 ###Delete a users
 @user.delete(
     path= '/users/{user_id}/delete',
-    response_model= User,
+    #response_model= User,
     status_code=status.HTTP_202_ACCEPTED,
     summary= 'Delete an user',
     tags= ['Users']
 )
-def delete_a_user():
-    pass
+def delete_a_user(user_id: str= Path(
+        ...,
+        title = "Delete a user",
+        description = "This path delete the user"
+        )):
+    """
+    This path operation delete a user in the app
+    Parameters:
+    user_id
+    -
+    return deleted
+    """ 
+    conn.execute(users.delete().where(users.c.id == user_id))
+    return 'deleted'
+
 ###Update a users
 @user.put(
     path= '/users/{user_id}/update',
-    response_model= User,
+    #response_model= User,
     status_code=status.HTTP_200_OK,
     summary= 'Update an user',
     tags= ['Users']
 )
-def update_a_user():
-    pass
+def update_a_user(user: User= Body(...),user_id: str= Path(
+        ...,
+        title = "Update a user",
+        description = "This path update the user information"
+        )):
+    """
+    This path operation delete a user in the app
+    Parameters:
+    user_id
+    -
+    return deleted
+    """ 
+    
+    conn.execute(users.update().values(first_name = user.first_name, last_name = user.last_name,
+        email= user.email_user).where(users.c.id == user_id))
+    return conn.execute(users.select().where(users.c.id == id)).first()
