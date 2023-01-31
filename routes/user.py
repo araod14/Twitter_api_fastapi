@@ -7,6 +7,7 @@ from models.user import users
 from config.db import conn
 from cryptography.fernet import Fernet
 from uuid import uuid4
+from sqlalchemy.sql import select
 import json 
 
 
@@ -86,7 +87,7 @@ def show_all_users():
         - Last_name: str
         - birth_date: datetime
     """
-    return conn.execute(users.select()).fetchall()
+    return conn.execute(select(users.c.id,users.c.first_name,users.c.last_name, users.c.email)).fetchall()
         
 ###Show a users
 @user.get(
