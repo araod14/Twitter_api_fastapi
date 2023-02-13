@@ -6,6 +6,7 @@ from schemas.tweet import Tweet
 from models.tweets import tweets
 from config.db import conn
 from uuid import uuid4
+from sqlalchemy import select
 
 
 
@@ -14,31 +15,29 @@ tweets = APIRouter()
 ##Tweets
 ###Show all tweets
 @tweets.get(
-    path= '/',
-    response_model= List[Tweet],
+    path= '/tweets',
+    #response_model= List[Tweet],
     status_code=status.HTTP_200_OK,
     summary= 'Show Tweets',
     tags= ['Tweet'])
 def home():
     """
-    Post a tweet
-    This path operation post a tweet in the app
+    Show all tweets
+    This path operation show all tweets in the app
     Parameters:
-        -Request body parameter
-            -tweet : Tweet
+        -Request Paths parameter
     
-    Return a json with the basic tweet information:
+    Return a json with the tweets information:
         - tweet_id: UUID 
         - content_tweet : str 
         - created_at: datetime
-        - update_at: Optional[datetime]
         - by: User 
     
     with open("tweets.json", "r", encoding="utf-8") as f:
         results = json.loads(f.read())
         return results 
     """
-    pass
+    return conn.execute(select(tweets.c.id_tweets,tweets.c.content,tweets.c.created)).fetchall()
 
 ###Post a tweet
 @tweets.post(
