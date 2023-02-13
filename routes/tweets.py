@@ -3,7 +3,9 @@ from fastapi import status
 from fastapi import Body
 from typing import List
 from schemas.tweet import Tweet
-import json 
+from models.tweets import tweets
+from config.db import conn
+from uuid import uuid4
 
 
 
@@ -31,10 +33,12 @@ def home():
         - created_at: datetime
         - update_at: Optional[datetime]
         - by: User 
-    """
+    
     with open("tweets.json", "r", encoding="utf-8") as f:
         results = json.loads(f.read())
         return results 
+    """
+    pass
 
 ###Post a tweet
 @tweets.post(
@@ -57,7 +61,7 @@ def post(tweet: Tweet = Body(...)):
         - created_at: datetime
         - update_at: Optional[datetime]
         - by: User 
-    """
+    
     with open("tweets.json", "r+", encoding="utf-8") as f:
         results = json.loads(f.read()) 
         tweet_dict = tweet.dict()
@@ -72,6 +76,10 @@ def post(tweet: Tweet = Body(...)):
         f.seek(0)
         f.write(json.dumps(results))
         return tweet
+    """
+    new_tweet = {'content':Tweet.content_tweet,'created':Tweet.created_at,'updated':Tweet.birth_date}
+    new_tweet['id'] = uuid4()
+    conn.execute(tweets.insert().values(new_tweet))
 
 ###Show a tweet
 @tweets.get(

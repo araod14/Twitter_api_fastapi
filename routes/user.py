@@ -8,7 +8,7 @@ from config.db import conn
 from cryptography.fernet import Fernet
 from uuid import uuid4
 from sqlalchemy.sql import select
-import json 
+
 
 
 key = Fernet.generate_key()
