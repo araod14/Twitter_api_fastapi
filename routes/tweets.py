@@ -41,7 +41,7 @@ def home():
 
 ###Post a tweet
 @tweets.post(
-    path= '/post',
+    path= 'users/{user_id}/post',
     response_model= Tweet,
     status_code=status.HTTP_201_CREATED,
     summary= 'Post a Tweet',
@@ -60,24 +60,10 @@ def post(tweet: Tweet = Body(...)):
         - created_at: datetime
         - update_at: Optional[datetime]
         - by: User 
-    
-    with open("tweets.json", "r+", encoding="utf-8") as f:
-        results = json.loads(f.read()) 
-        tweet_dict = tweet.dict()
-        tweet_dict['tweet_id'] = str(tweet_dict['tweet_id'])
-        tweet_dict['created_at'] = str(tweet_dict['created_at'])
-        if tweet_dict['update_at']:
-            tweet_dict['update_at'] = str(tweet_dict['update_at'])  ###OJO
-        tweet_dict['by']['user_id'] = str(tweet_dict['by']['user_id'])
-        tweet_dict['by']['birth_date'] = str(tweet_dict['by']['birth_date'])
 
-        results.append(tweet_dict)
-        f.seek(0)
-        f.write(json.dumps(results))
-        return tweet
     """
-    new_tweet = {'content':Tweet.content_tweet,'created':Tweet.created_at,'updated':Tweet.birth_date}
-    new_tweet['id'] = uuid4()
+    new_tweet = {'content':Tweet.content_tweet,'created':Tweet.created_at,'id':Tweet.by}
+    new_tweet['id_tweets'] = uuid4()
     conn.execute(tweets.insert().values(new_tweet))
 
 ###Show a tweet
