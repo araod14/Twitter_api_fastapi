@@ -1,16 +1,17 @@
+"""
 from sqlalchemy import Table, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-from config.db import meta, engine
+from config.db import Base
 
 
-tweets = Table(
-    'tweets', 
-    meta, 
-    Column('id_tweets',String(255),primary_key=True),
-    Column('content', String(255)),
-    Column('created', String(255)),
-    Column('updted', String(255)),
-    Column('id', String(255),ForeignKey("users.id"))
-)
-meta.create_all(engine)
+class Tweets(Base):
+    __tablename__ = "tweets"
+    id_tweets = Column(String,primary_key=True, index=True)
+    content = Column(String, index=True)
+    created = Column(String, index=True)
+    updted = Column(String, index=True)
+    owner_id = Column(String, ForeignKey("Users.id"))
+
+    owner = relationship("Users", back_populates="Tweets")
+    """

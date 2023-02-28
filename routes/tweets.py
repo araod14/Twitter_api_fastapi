@@ -3,11 +3,9 @@ from fastapi import status
 from fastapi import Body
 from typing import List
 from schemas.tweet import Tweet
-from models.tweets import tweets
-from config.db import conn
+#from models.tweets import Tweets
 from uuid import uuid4
 from sqlalchemy import select
-
 
 
 tweets = APIRouter()
@@ -32,12 +30,9 @@ def home():
         - content_tweet : str 
         - created_at: datetime
         - by: User 
-    
-    with open("tweets.json", "r", encoding="utf-8") as f:
-        results = json.loads(f.read())
-        return results 
     """
-    return conn.execute(select(tweets.c.id_tweets,tweets.c.content,tweets.c.created)).fetchall()
+    #return conn.execute(select(tweets.c.id_tweets,tweets.c.content,tweets.c.created)).fetchall()
+    pass
 
 ###Post a tweet
 @tweets.post(
@@ -61,24 +56,11 @@ def post(tweet: Tweet = Body(...)):
         - update_at: Optional[datetime]
         - by: User 
     
-    with open("tweets.json", "r+", encoding="utf-8") as f:
-        results = json.loads(f.read()) 
-        tweet_dict = tweet.dict()
-        tweet_dict['tweet_id'] = str(tweet_dict['tweet_id'])
-        tweet_dict['created_at'] = str(tweet_dict['created_at'])
-        if tweet_dict['update_at']:
-            tweet_dict['update_at'] = str(tweet_dict['update_at'])  ###OJO
-        tweet_dict['by']['user_id'] = str(tweet_dict['by']['user_id'])
-        tweet_dict['by']['birth_date'] = str(tweet_dict['by']['birth_date'])
-
-        results.append(tweet_dict)
-        f.seek(0)
-        f.write(json.dumps(results))
-        return tweet
     """
-    new_tweet = {'content':Tweet.content_tweet,'created':Tweet.created_at,'updated':Tweet.birth_date}
-    new_tweet['id'] = uuid4()
-    conn.execute(tweets.insert().values(new_tweet))
+    #new_tweet = {'content':Tweet.content_tweet,'created':Tweet.created_at,'updated':Tweet.birth_date}
+    #new_tweet['id'] = uuid4()
+    #conn.execute(tweets.insert().values(new_tweet))
+    pass
 
 ###Show a tweet
 @tweets.get(
