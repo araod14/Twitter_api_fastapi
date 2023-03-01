@@ -29,8 +29,21 @@ def get_db():
     summary= 'Regiter an user',
     tags= ['Users']
 )
-
-def signup(user: UserRegister, db: Session = Depends(get_db)):
+def signup_user(user: UserRegister, db: Session = Depends(get_db)):
+    """
+    Singup
+    This path operation register a user in the app
+    Parameters:
+        -Request body parameter
+            -user : UserRegiser
+    
+    Return a json with the basic user information:
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - Last_name: str
+        - birth_date: datetime
+    """
     return crud.create_user(db=db, user=user)
 
 ###Login a user

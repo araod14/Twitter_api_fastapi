@@ -21,7 +21,7 @@ class Tweets(Base):
     id_tweets = Column(String,primary_key=True, index=True)
     content = Column(String, index=True)
     created = Column(String, index=True)
-    updted = Column(String, index=True)
+    #updted = Column(String, index=True)
     owner_id = Column(String, ForeignKey("users.id"))
 
     owner = relationship("Users", back_populates="tweets")

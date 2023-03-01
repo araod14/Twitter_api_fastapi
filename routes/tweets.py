@@ -3,12 +3,24 @@ from fastapi import status
 from fastapi import Body
 from typing import List
 from schemas.tweet import Tweet
-#from models.tweets import Tweets
-from uuid import uuid4
+from schemas.user import User
+from fastapi import HTTPException, Depends
 from sqlalchemy import select
+from sqlalchemy.orm import Session
+from models.user import *
+from . import crud
+from config.db import session_local, engine
 
-
+Base.metadata.create_all(bind=engine)
 tweets = APIRouter()
+
+def get_db():
+    db = session_local()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 ##Tweets
 ###Show all tweets
@@ -36,12 +48,12 @@ def home():
 
 ###Post a tweet
 @tweets.post(
-    path= '/post',
-    response_model= Tweet,
+    path= '/users/{user_id}/post',
+    #response_model= Tweet,
     status_code=status.HTTP_201_CREATED,
     summary= 'Post a Tweet',
     tags= ['Tweet'])
-def post(tweet: Tweet = Body(...)):
+def post_tweet(tweet: Tweet, user_id:str, db: Session = Depends(get_db)):
     """
     Post a tweet
     This path operation post a tweet in the app
@@ -55,12 +67,8 @@ def post(tweet: Tweet = Body(...)):
         - created_at: datetime
         - update_at: Optional[datetime]
         - by: User 
-    
     """
-    #new_tweet = {'content':Tweet.content_tweet,'created':Tweet.created_at,'updated':Tweet.birth_date}
-    #new_tweet['id'] = uuid4()
-    #conn.execute(tweets.insert().values(new_tweet))
-    pass
+    return crud.create_tweet(db=db, tweet=tweet, user_id=user_id)
 
 ###Show a tweet
 @tweets.get(
