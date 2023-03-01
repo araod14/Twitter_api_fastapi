@@ -30,7 +30,7 @@ def get_db():
     status_code=status.HTTP_200_OK,
     summary= 'Show Tweets',
     tags= ['Tweet'])
-def home():
+def home(db:Session = Depends(get_db)):
     """
     Show all tweets
     This path operation show all tweets in the app
@@ -43,8 +43,7 @@ def home():
         - created_at: datetime
         - by: User 
     """
-    #return conn.execute(select(tweets.c.id_tweets,tweets.c.content,tweets.c.created)).fetchall()
-    pass
+    return crud.get_tweets(db=db)
 
 ###Post a tweet
 @tweets.post(

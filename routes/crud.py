@@ -36,8 +36,8 @@ def create_tweet(db:Session, tweet: Tweets, user_id:str):
     db.refresh(db_tweet)
     return db_tweet
 
-def get_tweets():
-    pass
+def get_tweets(db:Session):
+    return db.query(Tweets).all()
 
 def get_tweets_a_users():
     pass
