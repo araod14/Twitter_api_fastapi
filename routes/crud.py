@@ -21,6 +21,12 @@ def create_user(db:Session, user: UserRegister):
     db.refresh(new_user)
     return new_user
 
+def get_user_by_id(db:Session, user_id:str):
+    return db.query(Users).filter(Users.id == user_id).first()
+
+def get_user_by_email(db:Session, user_id:str):
+    pass
+
 def create_tweet(db:Session, tweet: Tweets, user_id:str):
     tweet_id = uuid4()
     db_tweet = Tweets(id_tweets=tweet_id, content=tweet.content_tweet, 
@@ -29,3 +35,9 @@ def create_tweet(db:Session, tweet: Tweets, user_id:str):
     db.commit()
     db.refresh(db_tweet)
     return db_tweet
+
+def get_tweets():
+    pass
+
+def get_tweets_a_users():
+    pass

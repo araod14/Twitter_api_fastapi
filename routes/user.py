@@ -89,10 +89,11 @@ def show_all_users():
     tags= ['Users']
 )
 def show_a_user(user_id: str = Path(
-        ...,
-        title = "User's ID",
-        description = "This is the person id. It's required"
-        )):
+                                ...,
+                                title = "User's ID",
+                                description = "This is the person id. It's required"
+                                ),  
+                db: Session = Depends(get_db)):
     """
     This path operation show a user in the app
     Parameters:
@@ -104,8 +105,7 @@ def show_a_user(user_id: str = Path(
         - Last_name: str
         - birth_date: datetime
     """
-    pass
-    #return conn.execute(Users.select().where(Users.c.id == id)).first()
+    return crud.get_user_by_id(db=db, user_id=user_id)
 
 ###Delete a users
 @user.delete(
