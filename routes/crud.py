@@ -10,6 +10,8 @@ from uuid import uuid4
 key = Fernet.generate_key()
 f =Fernet(key)
 
+
+##Users
 def create_user(db:Session, user: UserRegister):
     password_encrypted = f.encrypt(user.password.encode('utf-8'))
     user_id = uuid4()
@@ -21,12 +23,14 @@ def create_user(db:Session, user: UserRegister):
     db.refresh(new_user)
     return new_user
 
+def get_all_user(db:Session):
+    return db.query(Users).all()
+
 def get_user_by_id(db:Session, user_id:str):
     return db.query(Users).filter(Users.id == user_id).first()
 
-def get_user_by_email(db:Session, email_user:str):
-    return db.query(Users).filter(Users.email == email_user).first()
 
+##Tweets
 def create_tweet(db:Session, tweet: Tweets, user_id:str):
     tweet_id = uuid4()
     db_tweet = Tweets(id_tweets=tweet_id, content=tweet.content_tweet, 

@@ -88,13 +88,3 @@ def show_a_tweet():
     tags= ['Tweet'])
 def delete_a_tweet():
         pass
-
-###Update a tweet
-@tweets.put(
-    path= '/tweets/{tweet_id}/update', ###OJO
-    response_model= Tweet,
-    status_code=status.HTTP_200_OK,
-    summary= 'update a Tweet',
-    tags= ['Tweet'])
-def update_a_tweet():
-        pass

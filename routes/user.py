@@ -65,7 +65,7 @@ def login():
     summary= 'Show all users',
     tags= ['Users']
 )
-def show_all_users():
+def show_all_users(db:Session = Depends(get_db)):
     """
     This path operation show all users in the app
     Parameters:
@@ -77,8 +77,8 @@ def show_all_users():
         - Last_name: str
         - birth_date: datetime
     """
-    pass
-    #return conn.execute(select(Users.c.id,Users.c.first_name,Users.c.last_name, Users.c.email)).fetchall()
+    return crud.get_all_user(db=db)
+
         
 ###Show a users by id
 @user.get(
@@ -107,27 +107,6 @@ def show_a_user(user_id: str = Path(
     """
     return crud.get_user_by_id(db=db, user_id=user_id)
 
-###Show a users by email
-@user.get(
-    path= '/users',
-    #response_model= List[User],
-    status_code=status.HTTP_200_OK,
-    summary= 'Show a user, filtering by email',
-    tags= ['Users']
-)
-def show_a_user(email: str, db: Session = Depends(get_db)):
-    """
-    This operation show a user in the app, filtering by email, 
-    Parameters:
-    -
-    return a json list with all users in the app, with the following keys
-        - user_id: UUID
-        - email: Emailstr
-        - first_name: str
-        - Last_name: str
-        - birth_date: datetime
-    """
-    return crud.get_user_by_email(db=db, email=email)
 
 ###Delete a users
 @user.delete(
@@ -173,6 +152,4 @@ def update_a_user(user: User= Body(...),user_id: str= Path(
     return deleted
     """ 
     pass
-    #conn.execute(Users.update().values(first_name = user.first_name, last_name = user.last_name,
-    #    email= user.email_user).where(Users.c.id == user_id))
-    #return conn.execute(Users.select().where(Users.c.id == id)).first()
+    
