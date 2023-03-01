@@ -29,6 +29,9 @@ def get_all_user(db:Session):
 def get_user_by_id(db:Session, user_id:str):
     return db.query(Users).filter(Users.id == user_id).first()
 
+def delete_a_user(db:Session, user_id:str):
+    db.query(Users).filter(Users.id == user_id).delete(synchronize_session=False)
+    db.commit()
 
 ##Tweets
 def create_tweet(db:Session, tweet: Tweets, user_id:str):

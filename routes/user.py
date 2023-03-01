@@ -2,7 +2,6 @@ from fastapi import APIRouter
 from fastapi import status
 from fastapi import Body, Path
 from fastapi import HTTPException, Depends
-from typing import List
 from schemas.user import User, UserRegister
 from models.user import *
 from sqlalchemy.orm import Session
@@ -117,10 +116,12 @@ def show_a_user(user_id: str = Path(
     tags= ['Users']
 )
 def delete_a_user(user_id: str= Path(
-        ...,
-        title = "Delete a user",
-        description = "This path delete the user"
-        )):
+                                ...,
+                                title = "Delete a user",
+                                description = "This path delete the user"
+                                ),
+                db: Session = Depends(get_db)
+                ):
     """
     This path operation delete a user in the app
     Parameters:
@@ -128,8 +129,8 @@ def delete_a_user(user_id: str= Path(
     -
     return deleted
     """ 
-    #conn.execute(Users.delete().where(Users.c.id == user_id))
-    return 'deleted'
+    crud.delete_a_user(db=db, user_id=user_id)
+    return 'Deleted'
 
 ###Update a users
 @user.put(
