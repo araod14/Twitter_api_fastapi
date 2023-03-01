@@ -1,5 +1,5 @@
 
-from schemas.user import User, UserRegister
+from schemas.user import UserRegister
 from schemas.tweet import Tweet
 from models.user import Users, Tweets
 from sqlalchemy.orm import Session
@@ -24,8 +24,8 @@ def create_user(db:Session, user: UserRegister):
 def get_user_by_id(db:Session, user_id:str):
     return db.query(Users).filter(Users.id == user_id).first()
 
-def get_user_by_email(db:Session, user_id:str):
-    pass
+def get_user_by_email(db:Session, email_user:str):
+    return db.query(Users).filter(Users.email == email_user).first()
 
 def create_tweet(db:Session, tweet: Tweets, user_id:str):
     tweet_id = uuid4()

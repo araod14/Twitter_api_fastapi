@@ -80,7 +80,7 @@ def show_all_users():
     pass
     #return conn.execute(select(Users.c.id,Users.c.first_name,Users.c.last_name, Users.c.email)).fetchall()
         
-###Show a users
+###Show a users by id
 @user.get(
     path= '/users/{user_id}',
     #response_model= List[User],
@@ -106,6 +106,28 @@ def show_a_user(user_id: str = Path(
         - birth_date: datetime
     """
     return crud.get_user_by_id(db=db, user_id=user_id)
+
+###Show a users by email
+@user.get(
+    path= '/users',
+    #response_model= List[User],
+    status_code=status.HTTP_200_OK,
+    summary= 'Show a user, filtering by email',
+    tags= ['Users']
+)
+def show_a_user(email: str, db: Session = Depends(get_db)):
+    """
+    This operation show a user in the app, filtering by email, 
+    Parameters:
+    -
+    return a json list with all users in the app, with the following keys
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - Last_name: str
+        - birth_date: datetime
+    """
+    return crud.get_user_by_email(db=db, email=email)
 
 ###Delete a users
 @user.delete(
