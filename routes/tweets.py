@@ -79,6 +79,19 @@ def post_tweet(tweet: Tweet,
     summary= 'show all Tweets from a user',
     tags= ['Tweet'])
 def show_all_tweets(user_id:str, db: Session = Depends(get_db)):
+    """
+    Show all tweets from a user
+    This path operation show all tweets from a user
+    Parameters:
+        -Request Paths parameter
+        -User_id
+    
+    Return a json with the tweets information:
+        - tweet_id: UUID 
+        - content_tweet : str 
+        - created_at: datetime
+        - by: User 
+    """
     return crud.get_tweets_from_user(db=db, user_id=user_id)
 
 ###Delete a tweet
@@ -88,5 +101,14 @@ def show_all_tweets(user_id:str, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,
     summary= 'delete a Tweet',
     tags= ['Tweet'])
-def delete_a_tweet():
-        pass
+def delete_a_tweet(tweet_id:str, db: Session = Depends(get_db)):
+    """
+    This path operation delete a tweet in the app
+    Parameters:
+    -tweet_id
+    
+    return 
+    -deleted
+    """ 
+    crud.delete_a_tweet(db=db, tweet_id=tweet_id)
+    return 'Deleted'

@@ -49,5 +49,6 @@ def get_tweets(db:Session):
 def get_tweets_from_user(db:Session, user_id:str):
     return db.query(Tweets).filter(Tweets.owner_id == user_id).all()
 
-def delete_a_tweet():
-    pass
+def delete_a_tweet(db:Session, tweet_id:str):
+    db.query(Tweets).filter(Tweets.id_tweets == tweet_id).delete(synchronize_session=False)
+    db.commit()

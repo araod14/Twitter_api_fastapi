@@ -125,9 +125,10 @@ def delete_a_user(user_id: str= Path(
     """
     This path operation delete a user in the app
     Parameters:
-    user_id
-    -
-    return deleted
+    -user_id
+    
+    return 
+    -deleted
     """ 
     crud.delete_a_user(db=db, user_id=user_id)
     return 'Deleted'
@@ -148,9 +149,10 @@ def update_a_user(user: User= Body(...),user_id: str= Path(
     """
     This path operation delete a user in the app
     Parameters:
-    user_id
-    -
-    return deleted
+    - user_id
+    
+    return 
+    -updated
     """ 
     pass
     
