@@ -52,7 +52,9 @@ def home(db:Session = Depends(get_db)):
     status_code=status.HTTP_201_CREATED,
     summary= 'Post a Tweet',
     tags= ['Tweet'])
-def post_tweet(tweet: Tweet, user_id:str, db: Session = Depends(get_db)):
+def post_tweet(tweet: Tweet, 
+               user_id:str, 
+               db: Session = Depends(get_db)):
     """
     Post a tweet
     This path operation post a tweet in the app
@@ -69,15 +71,15 @@ def post_tweet(tweet: Tweet, user_id:str, db: Session = Depends(get_db)):
     """
     return crud.create_tweet(db=db, tweet=tweet, user_id=user_id)
 
-###Show a tweet
+###Show all tweets from a user
 @tweets.get(
-    path= '/tweets/{tweet_id}', ###OJO
-    response_model= Tweet,
+    path= '/users/{user_id}/tweets',
+    #response_model= Tweet,
     status_code=status.HTTP_200_OK,
-    summary= 'show a Tweet',
+    summary= 'show all Tweets from a user',
     tags= ['Tweet'])
-def show_a_tweet():
-        pass
+def show_all_tweets(user_id:str, db: Session = Depends(get_db)):
+    return crud.get_tweets_from_user(db=db, user_id=user_id)
 
 ###Delete a tweet
 @tweets.delete(

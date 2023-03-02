@@ -7,8 +7,6 @@ from uuid import UUID
 from datetime import date
 
 
-#Models
-
 class UserBase(BaseModel):
     user_id: UUID = Field(...)
     email_user: EmailStr =Field(...)

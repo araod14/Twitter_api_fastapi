@@ -46,5 +46,8 @@ def create_tweet(db:Session, tweet: Tweets, user_id:str):
 def get_tweets(db:Session):
     return db.query(Tweets).all()
 
-def get_tweets_a_users():
+def get_tweets_from_user(db:Session, user_id:str):
+    return db.query(Tweets).filter(Tweets.owner_id == user_id).all()
+
+def delete_a_tweet():
     pass
