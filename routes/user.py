@@ -2,10 +2,11 @@ from fastapi import APIRouter
 from fastapi import status
 from fastapi import Body, Path
 from fastapi import HTTPException, Depends
-from schemas.user import User, UserRegister
+from schemas.user import User, UserRegister,UserBase
 from sqlalchemy.orm import Session
 from . import crud
 from config.db import session_local, engine, Base
+
 
 Base.metadata.create_all(bind=engine)
 user = APIRouter()
@@ -42,7 +43,11 @@ def signup_user(user: UserRegister, db: Session = Depends(get_db)):
         - Last_name: str
         - birth_date: datetime
     """
-    return crud.create_user(db=db, user=user)
+    db_user = crud.get_user_by_email(db=db, email=user.email_user)
+    if db_user:
+        raise HTTPException(status_code=400, detail='Email already registered')
+    else:
+        return crud.create_user(db=db, user=user)
 
 ###Login a user
 @user.post(

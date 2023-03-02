@@ -32,6 +32,9 @@ def delete_a_user(db:Session, user_id:str):
     db.query(Users).filter(Users.id == user_id).delete(synchronize_session=False)
     db.commit()
 
+def get_user_by_email(db:Session, email:str):
+    return db.query(Users).filter(Users.email == email).first()
+
 ##Tweets
 def create_tweet(db:Session, tweet: Tweets, user_id:str):
     tweet_id = uuid4()
