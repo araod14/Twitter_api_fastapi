@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi import status
 from fastapi import Body, Path
 from fastapi import HTTPException, Depends
-from schemas.user import User, UserRegister,UserBase
+from schemas.user import User, UserRegister
 from sqlalchemy.orm import Session
 from . import crud
 from config.db import session_local, engine, Base
@@ -145,11 +145,14 @@ def delete_a_user(user_id: str= Path(
     summary= 'Update an user',
     tags= ['Users']
 )
-def update_a_user(user: User= Body(...),user_id: str= Path(
-        ...,
-        title = "Update a user",
-        description = "This path update the user information"
-        )):
+def update_a_user(user: User= Body(...),
+                  user_id: str= Path(
+                        ...,
+                        title = "Update a user",
+                        description = "This path update the user information"
+                        ),
+                db: Session = Depends(get_db)
+                ):
     """
     This path operation delete a user in the app
     Parameters:
@@ -158,5 +161,6 @@ def update_a_user(user: User= Body(...),user_id: str= Path(
     return 
     -updated
     """ 
-    pass
+    crud.update_user(db=db, user_id=user_id, user=user)
+    return 'Updated'
     

@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi import status
 from schemas.tweet import Tweet
-from fastapi import HTTPException, Depends
+from fastapi import Depends
 from sqlalchemy.orm import Session
 from models.models import *
 from . import crud
