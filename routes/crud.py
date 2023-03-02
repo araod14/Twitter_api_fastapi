@@ -1,7 +1,6 @@
 
 from schemas.user import UserRegister
-from schemas.tweet import Tweet
-from models.user import Users, Tweets
+from models.models import Users, Tweets
 from sqlalchemy.orm import Session
 from cryptography.fernet import Fernet
 from uuid import uuid4

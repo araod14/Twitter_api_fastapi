@@ -1,13 +1,9 @@
 from fastapi import APIRouter
 from fastapi import status
-from fastapi import Body
-from typing import List
 from schemas.tweet import Tweet
-from schemas.user import User
 from fastapi import HTTPException, Depends
-from sqlalchemy import select
 from sqlalchemy.orm import Session
-from models.user import *
+from models.models import *
 from . import crud
 from config.db import session_local, engine
 

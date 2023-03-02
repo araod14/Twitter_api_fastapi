@@ -3,10 +3,9 @@ from fastapi import status
 from fastapi import Body, Path
 from fastapi import HTTPException, Depends
 from schemas.user import User, UserRegister
-from models.user import *
 from sqlalchemy.orm import Session
 from . import crud
-from config.db import session_local, engine
+from config.db import session_local, engine, Base
 
 Base.metadata.create_all(bind=engine)
 user = APIRouter()
