@@ -7,11 +7,11 @@ from uuid import UUID
 from datetime import date
 
 
-#Models
-
 class UserBase(BaseModel):
     user_id: UUID = Field(...)
     email_user: EmailStr =Field(...)
+    owner_id: int
+
 
 class UserLogin(UserBase):
     password: str = Field(
@@ -32,6 +32,7 @@ class User(UserBase):
         min_length=1
     )
     birth_date: Optional[date] = Field(default=None)
+
 
 class UserRegister(User):
     password: str = Field(

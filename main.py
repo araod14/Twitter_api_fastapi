@@ -5,7 +5,7 @@ from routes.tweets import tweets
 
 app = FastAPI(
     title='API Twitter',
-    description='API modelo twitter',
+    description='API models twitter',
     version='0.0.9'
     )
 

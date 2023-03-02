@@ -1,31 +1,34 @@
 from fastapi import APIRouter
 from fastapi import status
 from fastapi import Body, Path
-from typing import List
+from fastapi import HTTPException, Depends
 from schemas.user import User, UserRegister
-from models.user import users
-from config.db import conn
-from cryptography.fernet import Fernet
-from uuid import uuid4
-from sqlalchemy.sql import select
+from sqlalchemy.orm import Session
+from . import crud
+from config.db import session_local, engine, Base
 
 
-
-key = Fernet.generate_key()
-f =Fernet(key)
+Base.metadata.create_all(bind=engine)
 user = APIRouter()
+
+def get_db():
+    db = session_local()
+    try:
+        yield db
+    finally:
+        db.close()
 
 #Path Operations
 ##Users
 ###Register a user
 @user.post(
     path= '/signup',
-    response_model= User,
+    #response_model= User,
     status_code=status.HTTP_201_CREATED,
     summary= 'Regiter an user',
     tags= ['Users']
 )
-def signup(user: UserRegister = Body(...)):
+def signup_user(user: UserRegister, db: Session = Depends(get_db)):
     """
     Singup
     This path operation register a user in the app
@@ -39,23 +42,12 @@ def signup(user: UserRegister = Body(...)):
         - first_name: str
         - Last_name: str
         - birth_date: datetime
-
-    with open("users.json", "r+", encoding="utf-8") as f:
-        results = json.loads(f.read()) 
-        user_dict = user.dict()
-        user_dict['user_id'] = str(user_dict['user_id'])
-        user_dict['birth_date'] = str(user_dict['birth_date'])
-        results.append(user_dict)
-        f.seek(0)
-        f.write(json.dumps(results))
-        return user
     """
-    new_user = {'first_name':user.first_name,'last_name':user.last_name,'birth_date':user.birth_date, 'email':user.email_user}
-    new_user['password'] = f.encrypt(user.password.encode('utf-8'))
-    new_user['id'] = uuid4()
-    conn.execute(users.insert().values(new_user))
-    #return conn.execute(users.select().where(users.c.id==result.inserted_primary_key['id'])).first()
-    #return result.inserted_primary_key['id']
+    db_user = crud.get_user_by_email(db=db, email=user.email_user)
+    if db_user:
+        raise HTTPException(status_code=400, detail='Email already registered')
+    else:
+        return crud.create_user(db=db, user=user)
 
 ###Login a user
 @user.post(
@@ -67,6 +59,7 @@ def signup(user: UserRegister = Body(...)):
 )
 def login():
     pass
+
 ###Show all users
 @user.get(
     path= '/users',
@@ -75,7 +68,7 @@ def login():
     summary= 'Show all users',
     tags= ['Users']
 )
-def show_all_users():
+def show_all_users(db:Session = Depends(get_db)):
     """
     This path operation show all users in the app
     Parameters:
@@ -87,9 +80,10 @@ def show_all_users():
         - Last_name: str
         - birth_date: datetime
     """
-    return conn.execute(select(users.c.id,users.c.first_name,users.c.last_name, users.c.email)).fetchall()
+    return crud.get_all_user(db=db)
+
         
-###Show a users
+###Show a users by id
 @user.get(
     path= '/users/{user_id}',
     #response_model= List[User],
@@ -98,10 +92,11 @@ def show_all_users():
     tags= ['Users']
 )
 def show_a_user(user_id: str = Path(
-        ...,
-        title = "User's ID",
-        description = "This is the person id. It's required"
-        )):
+                                ...,
+                                title = "User's ID",
+                                description = "This is the person id. It's required"
+                                ),  
+                db: Session = Depends(get_db)):
     """
     This path operation show a user in the app
     Parameters:
@@ -113,7 +108,8 @@ def show_a_user(user_id: str = Path(
         - Last_name: str
         - birth_date: datetime
     """
-    return conn.execute(users.select().where(users.c.id == user_id)).first()
+    return crud.get_user_by_id(db=db, user_id=user_id)
+
 
 ###Delete a users
 @user.delete(
@@ -124,19 +120,22 @@ def show_a_user(user_id: str = Path(
     tags= ['Users']
 )
 def delete_a_user(user_id: str= Path(
-        ...,
-        title = "Delete a user",
-        description = "This path delete the user"
-        )):
+                                ...,
+                                title = "Delete a user",
+                                description = "This path delete the user"
+                                ),
+                db: Session = Depends(get_db)
+                ):
     """
     This path operation delete a user in the app
     Parameters:
-    user_id
-    -
-    return deleted
+    -user_id
+    
+    return 
+    -deleted
     """ 
-    conn.execute(users.delete().where(users.c.id == user_id))
-    return 'deleted'
+    crud.delete_a_user(db=db, user_id=user_id)
+    return 'Deleted'
 
 ###Update a users
 @user.put(
@@ -146,19 +145,22 @@ def delete_a_user(user_id: str= Path(
     summary= 'Update an user',
     tags= ['Users']
 )
-def update_a_user(user: User= Body(...),user_id: str= Path(
-        ...,
-        title = "Update a user",
-        description = "This path update the user information"
-        )):
+def update_a_user(user: User= Body(...),
+                  user_id: str= Path(
+                        ...,
+                        title = "Update a user",
+                        description = "This path update the user information"
+                        ),
+                db: Session = Depends(get_db)
+                ):
     """
     This path operation delete a user in the app
     Parameters:
-    user_id
-    -
-    return deleted
-    """ 
+    - user_id
     
-    conn.execute(users.update().values(first_name = user.first_name, last_name = user.last_name,
-        email= user.email_user).where(users.c.id == user_id))
-    return conn.execute(users.select().where(users.c.id == id)).first()
+    return 
+    -updated
+    """ 
+    crud.update_user(db=db, user_id=user_id, user=user)
+    return 'Updated'
+    
