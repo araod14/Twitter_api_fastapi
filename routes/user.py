@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from fastapi import status
 from fastapi import Body, Path
 from fastapi import HTTPException, Depends
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from schemas.user import User, UserRegister
 from sqlalchemy.orm import Session
 from . import crud
@@ -10,6 +11,7 @@ from config.db import session_local, engine, Base
 
 Base.metadata.create_all(bind=engine)
 user = APIRouter()
+oauth2 = OAuth2PasswordBearer(tokenUrl="Login")
 
 def get_db():
     db = session_local()

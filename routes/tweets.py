@@ -43,13 +43,8 @@ def home(db:Session = Depends(get_db)):
 
 ###Post a tweet
 @tweets.post(
-<<<<<<< HEAD
-    path= 'users/{user_id}/post',
-    response_model= Tweet,
-=======
     path= '/users/{user_id}/post',
     #response_model= Tweet,
->>>>>>> basedata
     status_code=status.HTTP_201_CREATED,
     summary= 'Post a Tweet',
     tags= ['Tweet'])
@@ -69,16 +64,8 @@ def post_tweet(tweet: Tweet,
         - created_at: datetime
         - update_at: Optional[datetime]
         - by: User 
-<<<<<<< HEAD
-
-    """
-    new_tweet = {'content':Tweet.content_tweet,'created':Tweet.created_at,'id':Tweet.by}
-    new_tweet['id_tweets'] = uuid4()
-    conn.execute(tweets.insert().values(new_tweet))
-=======
     """
     return crud.create_tweet(db=db, tweet=tweet, user_id=user_id)
->>>>>>> basedata
 
 ###Show all tweets from a user
 @tweets.get(
