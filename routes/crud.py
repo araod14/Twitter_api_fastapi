@@ -4,10 +4,13 @@ from models.models import Users, Tweets
 from sqlalchemy.orm import Session
 from cryptography.fernet import Fernet
 from uuid import uuid4
+from fastapi import HTTPException, Depends
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 
 key = Fernet.generate_key()
 f =Fernet(key)
+oauth2 = OAuth2PasswordBearer(tokenUrl="crud")
 
 
 ##Users
@@ -27,6 +30,14 @@ def get_all_user(db:Session):
 
 def get_user_by_id(db:Session, user_id:str):
     return db.query(Users).filter(Users.id == user_id).first()
+
+def get_user_by_email(db:Session, email:str):
+    return db.query(Users).filter(Users.email == email).first()
+
+def login_a_user(db:Session ,form:OAuth2PasswordRequestForm = Depends()):
+    if not form.password == Users.password:
+        raise HTTPException(status_code=400, detail="wrong password")
+    return {"acces_token":Users.email,"token_type":"bearer"}
 
 def delete_a_user(db:Session, user_id:str):
     db.query(Users).filter(Users.id == user_id).delete(synchronize_session=False)
