@@ -8,6 +8,7 @@ from config.db import Base
 class Users(Base):
     __tablename__ = "users" 
     id = Column(String,primary_key=True, index=True)
+    user_name = Column(String, index=True)
     first_name = Column(String, index=True)
     last_name = Column(String, index=True)
     email = Column(String, index=True)

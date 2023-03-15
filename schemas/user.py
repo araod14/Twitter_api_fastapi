@@ -8,10 +8,11 @@ from datetime import date
 
 
 class UserBase(BaseModel):
-    user_id: UUID = Field(...)
-    email_user: EmailStr =Field(...)
-    owner_id: int
-
+    username:str = Field(
+        ...,
+        max_length= 20,
+        min_length=1
+    )
 
 class UserLogin(UserBase):
     password: str = Field(
@@ -31,7 +32,10 @@ class User(UserBase):
         max_length= 20,
         min_length=1
     )
+    email_user: EmailStr =Field(...)
     birth_date: Optional[date] = Field(default=None)
+    user_id: UUID = Field(...)
+    owner_id: int
 
 
 class UserRegister(User):

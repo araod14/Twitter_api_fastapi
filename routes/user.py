@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from fastapi import status
 from fastapi import Body, Path
 from fastapi import HTTPException, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from schemas.user import User, UserRegister
 from sqlalchemy.orm import Session
 from . import crud
@@ -23,7 +24,6 @@ def get_db():
 ###Register a user
 @user.post(
     path= '/signup',
-    #response_model= User,
     status_code=status.HTTP_201_CREATED,
     summary= 'Regiter an user',
     tags= ['Users']
@@ -52,21 +52,40 @@ def signup_user(user: UserRegister, db: Session = Depends(get_db)):
 ###Login a user
 @user.post(
     path= '/login',
-    response_model= User,
     status_code=status.HTTP_200_OK,
     summary= 'login an user',
     tags= ['Users']
 )
-def login(user: UserRegister, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_email(db, email=user.email)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    return crud.login_a_user(db=db, user=user)
+def login(
+        db: Session = Depends(get_db), 
+        form_data:OAuth2PasswordRequestForm = Depends()
+        ):
+    #return crud.login_a_user(db=db, user=user)
+    """
+    OAuth2 compatible token login, get an access token for future requests
+    """
+    user = crud.authenticate(
+        db, username=form_data.username, password=form_data.password
+        )
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect username")
+    return {"acces_token": user.user_name,"token_type":"bearer"}
+
+@user.get(
+    path= '/users/me',
+    status_code=status.HTTP_200_OK,
+    summary= 'login an user',
+    tags= ['Users']
+    )
+def me(current_user: User = Depends(crud.get_current_user)):
+    """
+    Test access
+    """
+    return current_user
 
 ###Show all users
 @user.get(
     path= '/users',
-    #response_model= User,
     status_code=status.HTTP_200_OK,
     summary= 'Show all users',
     tags= ['Users']
@@ -89,7 +108,6 @@ def show_all_users(db:Session = Depends(get_db)):
 ###Show a users by id
 @user.get(
     path= '/users/{user_id}',
-    #response_model= List[User],
     status_code=status.HTTP_200_OK,
     summary= 'Show a user',
     tags= ['Users']
@@ -117,7 +135,6 @@ def show_a_user(user_id: str = Path(
 ###Delete a users
 @user.delete(
     path= '/users/{user_id}/delete',
-    #response_model= User,
     status_code=status.HTTP_202_ACCEPTED,
     summary= 'Delete an user',
     tags= ['Users']
@@ -143,7 +160,6 @@ def delete_a_user(user_id: str= Path(
 ###Update a users
 @user.put(
     path= '/users/{user_id}/update',
-    #response_model= User,
     status_code=status.HTTP_200_OK,
     summary= 'Update an user',
     tags= ['Users']
