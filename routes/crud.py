@@ -1,27 +1,58 @@
 
+from datetime import datetime, timedelta
 from schemas.user import UserRegister
 from models.models import Users, Tweets
 from sqlalchemy.orm import Session
-from cryptography.fernet import Fernet
 from uuid import uuid4
+from typing import Any, Union
 from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
+from jose import jwt
+from passlib.context import CryptContext
 from config.db import session_local
 
-key = Fernet.generate_key()
-f =Fernet(key)
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+ALGORITHM = "HS256"
+SECRET_KEY = "4685284629656970e8d44144d3f9e94baff7ff006ee10062f0171a28fdb3023f"
+# 60 minutes * 24 hours * 8 days = 8 days
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+##Get database
 def get_db():
     db = session_local()
     try:
         yield db
     finally:
         db.close()
+
+##Create token acces
+def create_access_token(
+    subject: Union[str, Any], 
+    expires_delta: timedelta = None
+    ) -> str:
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(
+            minutes = ACCESS_TOKEN_EXPIRE_MINUTES
+        )
+    to_encode = {"exp": expire, "sub": str(subject)}
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def verify_password(plain_password: str, hashed_password: str):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password: str):
+    return pwd_context.hash(password)
+
 ##Users
 def create_user(db:Session, user: UserRegister):
-    password_encrypted = f.encrypt(user.password.encode('utf-8'))
+    hashed_password = get_password_hash(user.password)
     user_id = uuid4()
-    new_user = Users(id=user_id, user_name=user.username ,password=password_encrypted,
+    new_user = Users(id=user_id, user_name=user.username ,password=hashed_password,
                     first_name=user.first_name, last_name=user.last_name,
                     birth_date=user.birth_date, email=user.email_user)
     db.add(new_user)
@@ -42,12 +73,11 @@ def authenticate(db: Session, *, username: str, password: str):
     user = get_user_by_username(db, username=username)
     if not user:
         return None
-    password_db = db.query(Users).filter(Users.password==password)
-    if not password_db:
+    #password_db = db.query(Users).filter(Users.password==password)
+    if not verify_password(password, user.password):
         raise HTTPException(status_code=400, detail="wrong password")
     return user
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 def get_current_user(db:Session=Depends(get_db), token: str = Depends(oauth2_scheme)):
     user = get_user_by_username(db, username=token)
     if not user:

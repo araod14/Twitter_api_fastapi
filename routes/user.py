@@ -1,3 +1,4 @@
+from datetime import timedelta
 from fastapi import APIRouter
 from fastapi import status
 from fastapi import Body, Path
@@ -68,7 +69,13 @@ def login(
         )
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username")
-    return {"acces_token": user.user_name,"token_type":"bearer"}
+    access_token_expires = timedelta(minutes=crud.ACCESS_TOKEN_EXPIRE_MINUTES)
+    return {
+        "access_token": crud.create_access_token(
+        user.id, expires_delta=access_token_expires
+        ),
+        "token_type": "bearer",
+        }
 
 @user.get(
     path= '/users/me',
