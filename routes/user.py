@@ -175,7 +175,7 @@ def update_a_user(user: User= Body(...),
                   user_id: str= Path(
                         ...,
                         title = "Update a user",
-                        description = "This path update the user information"
+                        description = "This path update the user name information"
                         ),
                 db: Session = Depends(get_db)
                 ):

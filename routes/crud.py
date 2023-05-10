@@ -75,6 +75,9 @@ def get_user_by_username(db:Session, username:str):
 def get(db:Session, id:str): 
     return db.query(Users).filter(Users.id == id).first()
 
+def get_user_by_id(db:Session, user_id:str): 
+    return db.query(Users).filter(Users.id == user_id).first()
+
 def get_user_by_email(db:Session, email:str):
     return db.query(Users).filter(Users.email == email).first()
 
@@ -105,16 +108,6 @@ def get_current_user(
             raise HTTPException(status_code=404, detail="User not found")
         return user
     
-"""
-   user = get_user_by_username(db, username=token)
-    if not user:
-        raise HTTPException(
-            status_code=400, 
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
-"""
 def delete_a_user(db:Session, user_id:str):
     db.query(Users).filter(Users.id == user_id).delete(synchronize_session=False)
     db.commit()
