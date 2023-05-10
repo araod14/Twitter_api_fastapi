@@ -78,7 +78,9 @@ def authenticate(db: Session, *, username: str, password: str):
         raise HTTPException(status_code=400, detail="wrong password")
     return user
 
-def get_current_user(db:Session=Depends(get_db), token: str = Depends(oauth2_scheme)):
+def get_current_user(
+        db:Session=Depends(get_db), 
+        token: str = Depends(oauth2_scheme)):
     user = get_user_by_username(db, username=token)
     if not user:
         raise HTTPException(

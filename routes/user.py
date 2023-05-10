@@ -52,7 +52,7 @@ def signup_user(user: UserRegister, db: Session = Depends(get_db)):
 
 ###Login a user
 @user.post(
-    path= '/login',
+    path= '/login/access-token',
     status_code=status.HTTP_200_OK,
     summary= 'login an user',
     tags= ['Users']
