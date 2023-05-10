@@ -5,6 +5,7 @@ from fastapi import Body, Path
 from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from schemas.user import User, UserRegister
+from models.models import Users
 from sqlalchemy.orm import Session
 from . import crud
 from config.db import session_local, engine, Base
@@ -83,7 +84,7 @@ def login(
     summary= 'login an user',
     tags= ['Users']
     )
-def me(current_user: User = Depends(crud.get_current_user)):
+def me(current_user: Users = Depends(crud.get_current_user)):
     """
     Test access
     """

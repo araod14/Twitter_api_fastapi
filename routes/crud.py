@@ -1,7 +1,8 @@
 
 from datetime import datetime, timedelta
-from schemas.user import UserRegister
+from schemas.user import UserRegister, Token
 from models.models import Users, Tweets
+from config.db import session_local
 from sqlalchemy.orm import Session
 from uuid import uuid4
 from typing import Any, Union
@@ -9,10 +10,15 @@ from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from passlib.context import CryptContext
-from config.db import session_local
+
+from fastapi import HTTPException, status
+from pydantic import ValidationError
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+reusable_oauth2 = OAuth2PasswordBearer(
+    tokenUrl="/login/access-token"
+)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
 SECRET_KEY = "4685284629656970e8d44144d3f9e94baff7ff006ee10062f0171a28fdb3023f"
@@ -66,6 +72,9 @@ def get_all_user(db:Session):
 def get_user_by_username(db:Session, username:str): 
     return db.query(Users).filter(Users.user_name == username).first()
 
+def get(db:Session, id:str): 
+    return db.query(Users).filter(Users.id == id).first()
+
 def get_user_by_email(db:Session, email:str):
     return db.query(Users).filter(Users.email == email).first()
 
@@ -80,8 +89,24 @@ def authenticate(db: Session, *, username: str, password: str):
 
 def get_current_user(
         db:Session=Depends(get_db), 
-        token: str = Depends(oauth2_scheme)):
-    user = get_user_by_username(db, username=token)
+        token: str = Depends(reusable_oauth2)):
+        try:
+            payload = jwt.decode(
+                token, SECRET_KEY, algorithms=ALGORITHM
+                )
+            token_data = Token(**payload)
+        except (jwt.JWTError, ValidationError):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Could not validate credentials",
+        )
+        user = get(db, id=token_data.sub)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
+    
+"""
+   user = get_user_by_username(db, username=token)
     if not user:
         raise HTTPException(
             status_code=400, 
@@ -89,7 +114,7 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
-
+"""
 def delete_a_user(db:Session, user_id:str):
     db.query(Users).filter(Users.id == user_id).delete(synchronize_session=False)
     db.commit()

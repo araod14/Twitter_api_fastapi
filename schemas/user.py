@@ -37,7 +37,10 @@ class User(UserBase):
     user_id: UUID = Field(...)
     owner_id: int
 
-
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    
 class UserRegister(User):
     password: str = Field(
         ...,
