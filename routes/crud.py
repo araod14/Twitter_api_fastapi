@@ -109,7 +109,12 @@ def get_current_user(
         return user
     
 def delete_a_user(db:Session, user_id:str):
-    db.query(Users).filter(Users.id == user_id).delete(synchronize_session=False)
+    # Buscar el usuario que deseas eliminar
+    user = db.query(Users).filter_by(id = user_id).first()
+    # Si el usuario existe, borrar todos sus tweets
+    if user:
+        db.query(Tweets).filter_by(owner_id = user.id).delete()
+        db.delete(user)
     db.commit()
 
 def update_user(db:Session, user_id:str, user:Users):
