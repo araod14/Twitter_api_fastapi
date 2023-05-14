@@ -1,13 +1,14 @@
 from sqlalchemy import Table, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-
 from config.db import Base
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 
 
 
 class Users(Base):
     __tablename__ = "users" 
-    id = Column(String,primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True),primary_key=True,  default=uuid.uuid4)
     user_name = Column(String, index=True)
     first_name = Column(String, index=True)
     last_name = Column(String, index=True)

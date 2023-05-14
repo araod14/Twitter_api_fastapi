@@ -58,6 +58,7 @@ def get_password_hash(password: str):
 def create_user(db:Session, user: UserRegister):
     hashed_password = get_password_hash(user.password)
     user_id = uuid4()
+    user_id = str(user_id)
     new_user = Users(id=user_id, user_name=user.username ,password=hashed_password,
                     first_name=user.first_name, last_name=user.last_name,
                     birth_date=user.birth_date, email=user.email_user)
@@ -124,6 +125,7 @@ def update_user(db:Session, user_id:str, user:Users):
 ##Tweets
 def create_tweet(db:Session, tweet: Tweets, user_id:str):
     tweet_id = uuid4()
+    tweet_id = str (tweet_id)
     db_tweet = Tweets(id_tweets=tweet_id, content=tweet.content_tweet, 
                     created=tweet.created_at, owner_id=user_id)
     db.add(db_tweet)
