@@ -1,3 +1,5 @@
+import json
+from fastapi.testclient import TestClient
 from fastapi import APIRouter
 from fastapi import status
 from schemas.tweet import Tweet
@@ -108,3 +110,33 @@ def delete_a_tweet(tweet_id:str, db: Session = Depends(get_db)):
     """ 
     crud.delete_a_tweet(db=db, tweet_id=tweet_id)
     return 'Deleted'
+
+#Tests ## pip install httpx
+client = TestClient(tweets)
+tweets = [
+    {
+        "content_tweet": "First tweet"
+    },
+    {
+        "content_tweet": "Second tweet"
+    }
+]
+
+def test_post_tweet():
+    response = client.post("/users/1/post", json=tweets[0])
+    assert response.status_code == 201
+    assert response.json()["content_tweet"] == "First tweet"
+
+def test_get_tweets():
+    response = client.get("/tweets")
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+    assert response.json()[0]["content_tweet"] == "First tweet"
+    assert response.json()[1]["content_tweet"] == "Second tweet"
+
+def test_get_tweets_from_user():
+    response = client.get("/users/1/tweets")
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+
+
