@@ -108,3 +108,4 @@ def delete_a_tweet(tweet_id:str, db: Session = Depends(get_db)):
     """ 
     crud.delete_a_tweet(db=db, tweet_id=tweet_id)
     return 'Deleted'
+
